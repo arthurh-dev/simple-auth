@@ -12,6 +12,12 @@ class User extends Model {
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
+    public static function updateVerificationStatus($email) {
+        $db = self::getDB();
+        $stmt = $db->prepare("UPDATE users SET is_verified = 1 WHERE email = :email");
+        $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
     public static function create($username, $email, $passwordHash) {
         $db = self::getDB();
         $stmt = $db->prepare('INSERT INTO users (username, email, password_hash) VALUES (:username, :email, :password_hash)');

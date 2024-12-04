@@ -1,24 +1,33 @@
 <?php
+
 namespace Core;
 
-class Router {
-    private $routes = [];
+class Router
+{
+    protected $routes = [];
 
-    public function add($route, $handler) {
-        $this->routes[$route] = $handler;
+    // Adicionar uma rota ao roteador
+    public function add($route, $action)
+    {
+        $this->routes[$route] = $action;
     }
 
-    public function dispatch($uri) {
-        foreach ($this->routes as $route => $handler) {
-            if ($route === $uri) {
-                list($controller, $method) = explode('@', $handler);
-                $controller = "App\\Controllers\\$controller";
-                if (class_exists($controller) && method_exists($controller, $method)) {
-                    return (new $controller)->$method();
-                }
+    // Despachar a rota
+    public function dispatch($uri)
+    {
+        if (array_key_exists($uri, $this->routes)) {
+            list($controller, $method) = explode('@', $this->routes[$uri]);
+            $controller = "App\\Controllers\\$controller";
+            
+            if (class_exists($controller) && method_exists($controller, $method)) {
+                $instance = new $controller();
+                $instance->$method();
+            } else {
+                throw new \Exception("Controller or method not found: $controller@$method");
             }
+        } else {
+            http_response_code(404);
+            echo "404 - Route not found.";
         }
-        http_response_code(404);
-        echo "404 Not Found";
     }
 }
