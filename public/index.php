@@ -6,12 +6,18 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 use Core\Router;
+use Dotenv\Dotenv;
+
+// Carregar o .env da raiz do projeto
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
 $router = new Router();
-
 // Definir as rotas
 $router->add('/', 'HomeController@index');
 $router->add('/register', 'AuthController@register');
+$router->add('/confirm/{token}', 'AuthController@confirm');
+
 
 // Obter a URI atual
 $basePath = '/simple-auth'; // Subpasta do projeto

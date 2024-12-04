@@ -3,11 +3,11 @@ require_once '../vendor/autoload.php'; // Inclusão do autoload do Composer
 
 use App\Models\User;
 
-if (isset($_GET['email'])) {
-    $email = $_GET['email'];
+if (isset($_GET['token'])) {
+    $token = $_GET['token'];
 
-    // Verificar se o e-mail existe no banco de dados
-    $user = User::findByEmail($email);
+    // Verificar se o token existe no banco de dados
+    $user = User::findByToken($token);
 
     if ($user) {
         // Verificar se o usuário já foi confirmado
@@ -15,15 +15,15 @@ if (isset($_GET['email'])) {
             echo "Este e-mail já foi confirmado!";
         } else {
             // Se o e-mail não foi confirmado, atualize o status
-            if (User::updateVerificationStatus($email)) {
+            if (User::updateVerificationStatus($user['email'])) {
                 echo "E-mail confirmado com sucesso!";
             } else {
                 echo "Erro ao confirmar o e-mail. Tente novamente mais tarde.";
             }
         }
     } else {
-        echo "Este e-mail não existe ou não foi registrado.";
+        echo "Este token de confirmação não é válido.";
     }
 } else {
-    echo "E-mail não fornecido.";
+    echo "Token não fornecido.";
 }

@@ -8,7 +8,37 @@ use PHPMailer\PHPMailer\Exception;
 
 class AuthController
 {
-    // Método para exibir o formulário de registro e processar o envio
+public function confirm($token)
+{
+    // Verificar se o token foi fornecido
+    if (empty($token)) {
+        echo "Token inválido.";
+        return;
+    }
+
+    // Buscar o usuário pelo token
+    $user = User::findByToken($token);
+
+    if (!$user) {
+        echo "Token inválido ou expirado.";
+        return;
+    }
+
+    // Verificar se o e-mail já foi verificado
+    if ($user['is_verified'] == 1) {
+        echo "O e-mail já foi confirmado.";
+        return;
+    }
+
+    // Atualizar o status de verificação do usuário
+    $result = User::verifyEmail($user['email']);
+
+    if ($result) {
+        echo "E-mail confirmado com sucesso!";
+    } else {
+        echo "Erro ao confirmar o e-mail. Tente novamente.";
+    }
+}
 public function register()
     {
         // Verificar se o formulário foi enviado
@@ -42,34 +72,45 @@ public function register()
     }
 
     // Método para enviar o email de confirmação
- private function sendConfirmationEmail($email)
-    {
-        $mail = new PHPMailer(true);
-        
-        try {
-            // Configuração do servidor de e-mail (Exemplo para Gmail)
-            $mail->isSMTP();                                            // Send using SMTP
-            $mail->Host       = 'smtp.gmail.com';                        // Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                    // Enable SMTP authentication
-            $mail->Username   = 'arthurhenrique010702@gmail.com';                  // SMTP username
-            $mail->Password   = 'xkos nytg dwbh czdb';                      // SMTP password (se você estiver usando o Gmail, crie uma senha de app)
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;          // Enable TLS encryption
-            $mail->Port       = 587;                                     // TCP port to connect to
+private function sendConfirmationEmail($email)
+{
+    $mail = new PHPMailer(true);
+    
+    try {
+        // Configuração do servidor de e-mail (Exemplo para Gmail)
+        $mail->isSMTP();                                            // Send using SMTP
+        $mail->Host = $_ENV['MAIL_HOST'];                       // Set the SMTP server to send through
+        $mail->SMTPAuth   = true;                                    // Enable SMTP authentication
+        $mail->Username = $_ENV['MAIL_USERNAME'];
+        $mail->Password = $_ENV['MAIL_PASSWORD'];
+        $mail->SMTPSecure = $_ENV['MAIL_SMTPSECURE'];
+        $mail->Port = $_ENV['MAIL_PORT'];
 
-            // Remetente e destinatário
-            $mail->setFrom('arthurhenrique010702@gmail.com', 'Teste');
-            $mail->addAddress($email);                                    // Add a recipient
+        // Gerar o token único para confirmação
+        $token = bin2hex(random_bytes(16));  // Gera um token aleatório de 32 caracteres
 
-            // Conteúdo do e-mail
-            $mail->isHTML(true);                                          // Set email format to HTML
-            $mail->Subject = 'Confirmação de Registro';
-            $mail->Body    = 'Obrigado por se registrar!<br>Por favor, clique no link abaixo para confirmar seu e-mail.<br><a href="localhost/confirm-email.php?email=' . urlencode($email) . '">Confirmar e-mail</a>';
+        // Armazenar o token no banco de dados (você deve ter um método para associar o token ao usuário)
+        User::storeVerificationToken($email, $token); // Armazenando no banco
 
-            // Enviar o e-mail
-            $mail->send();
-            echo 'Mensagem de confirmação enviada.';
-        } catch (Exception $e) {
-            echo "Erro ao enviar o e-mail. Erro: {$mail->ErrorInfo}";
-        }
+        // Gerar o link de confirmação com o token
+        $verificationLink = "http://localhost/simple-auth/confirm/$token";
+
+        // Remetente e destinatário
+        $mail->setFrom('arthurhenrique010702@gmail.com', 'Teste');
+        $mail->addAddress($email);                                    // Add a recipient
+
+        // Conteúdo do e-mail
+        $mail->isHTML(true);                                          // Set email format to HTML
+        $mail->CharSet = 'UTF-8';                                     // Garantir que a codificação seja UTF-8
+        $mail->Subject = 'Confirmação de Registro';
+        $mail->Body    = 'Obrigado por se registrar!<br>Por favor, clique no link abaixo para confirmar seu e-mail.<br><a href="' . $verificationLink . '">Confirmar e-mail</a>';
+
+        // Enviar o e-mail
+        $mail->send();
+        echo 'Mensagem de confirmação enviada.';
+    } catch (Exception $e) {
+        echo "Erro ao enviar o e-mail. Erro: {$mail->ErrorInfo}";
     }
 }
+}
+
