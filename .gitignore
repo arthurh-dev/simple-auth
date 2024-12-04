@@ -1,17 +1,3 @@
-# Ignorar arquivos de configuração locais
-*.env
-
-# Ignorar pastas de dependências
-/vendor/
-node_modules/
-
-# Ignorar arquivos de log
-*.log
-
-# Ignorar diretórios do sistema
-.DS_Store
-.idea/
-.vscode/
-
-# Ignorar pastas temporárias
-tmp/
+/vendor
+/config/config.php
+/.env
