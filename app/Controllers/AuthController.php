@@ -96,7 +96,7 @@ private function sendConfirmationEmail($email)
         $verificationLink = "http://localhost/simple-auth/confirm/$token";
 
         // Remetente e destinatário
-        $mail->setFrom('arthurhenrique010702@gmail.com', 'Teste');
+        $mail->setFrom($_ENV['MAIL_USERNAME'], 'Teste');
         $mail->addAddress($email);                                    // Add a recipient
 
         // Conteúdo do e-mail
