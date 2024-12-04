@@ -63,7 +63,7 @@ public function register()
             // Conteúdo do e-mail
             $mail->isHTML(true);                                          // Set email format to HTML
             $mail->Subject = 'Confirmação de Registro';
-            $mail->Body    = 'Obrigado por se registrar!<br>Por favor, clique no link abaixo para confirmar seu e-mail.<br><a href="localhost/simple-auth/confirm-email.php?email=' . urlencode($email) . '">Confirmar e-mail</a>';
+            $mail->Body    = 'Obrigado por se registrar!<br>Por favor, clique no link abaixo para confirmar seu e-mail.<br><a href="localhost/confirm-email.php?email=' . urlencode($email) . '">Confirmar e-mail</a>';
 
             // Enviar o e-mail
             $mail->send();
