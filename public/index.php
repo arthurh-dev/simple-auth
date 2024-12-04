@@ -6,10 +6,10 @@ use Core\Router;
 
 $router = new Router();
 
-// Defina as rotas
+// Definir as rotas
 $router->add('/', 'HomeController@index');
-$router->add('/login', 'AuthController@login');
 $router->add('/register', 'AuthController@register');
 
+// Obter a URI atual e despachar para o roteador
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $router->dispatch($uri);
