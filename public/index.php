@@ -13,7 +13,7 @@ $dotenv->load();
 
 $router = new Router();
 
-// Definir as rotas
+// Definir as rotas das páginas
 $router->add('/', 'HomeController@index');
 $router->add('/register', 'AuthController@register');
 $router->add('/login', 'AuthController@login');
@@ -21,9 +21,12 @@ $router->add('/confirm/{token}', 'AuthController@confirm');
 $router->add('/dashboard', 'DashboardController@index');
 $router->add('/logout', 'AuthController@logout');
 
+// Rotas Do Google e de outras API'S de auth
+$router->add('/google-login', 'AuthController@googleLogin');
+$router->add('/google-callback', 'AuthController@googleCallback');
 
 
-$basePath = '/simple-auth'; // Subpasta do projeto
+$basePath = '/simple-auth'; 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 

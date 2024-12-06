@@ -73,10 +73,26 @@ class User extends Model {
     }
     public static function create($username, $email, $passwordHash) {
         $db = self::getDB();
-        $stmt = $db->prepare('INSERT INTO users (username, email, password_hash) VALUES (:username, :email, :password_hash)');
+        $stmt = $db->prepare('INSERT INTO users (username, email, password_hash, user_created_by) VALUES (:username, :email, :password_hash, "Sign Up")');
         $stmt->bindValue(':username', $username, \PDO::PARAM_STR);
         $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
         $stmt->bindValue(':password_hash', $passwordHash, \PDO::PARAM_STR);
+        return $stmt->execute();
+    }
+    public static function generateRandomPasswordHash()
+    {
+        return password_hash(uniqid(rand(), true), PASSWORD_DEFAULT);
+    }
+    public static function createSocialUser($username, $email)
+    {
+        $passwordHash = self::generateRandomPasswordHash(); 
+        $db = self::getDB();
+
+        $stmt = $db->prepare('INSERT INTO users (username, email, password_hash, is_verified, user_created_by) VALUES (:username, :email, :password_hash, 1, "Social User")');
+        $stmt->bindValue(':username', $username, \PDO::PARAM_STR);
+        $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
+        $stmt->bindValue(':password_hash', $passwordHash, \PDO::PARAM_STR);
+
         return $stmt->execute();
     }
 }

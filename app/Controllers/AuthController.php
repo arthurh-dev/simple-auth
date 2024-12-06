@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Models\User;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
+use Google\Client as GoogleClient;
 class AuthController
 {
 public function confirm($token)
@@ -149,5 +149,64 @@ private function sendConfirmationEmail($email)
         echo "Erro ao enviar o e-mail. Erro: {$mail->ErrorInfo}";
     }
 }
+
+public function googleLogin()
+{
+    $client = new GoogleClient();
+    $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+    $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+    $client->setRedirectUri('http://localhost/simple-auth/google-callback');
+    $client->addScope('email');
+    $client->addScope('profile');
+
+    $authUrl = $client->createAuthUrl();
+
+    header('Location: ' . $authUrl);
+    exit;
+}
+public function googleCallback()
+{
+    $client = new GoogleClient();
+    $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+    $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+    $client->setRedirectUri('http://localhost/simple-auth/google-callback');
+
+    if (!isset($_GET['code'])) {
+        echo "Código de autorização não fornecido.";
+        return;
+    }
+
+    $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
+    $client->setAccessToken($token);
+
+    $googleService = new \Google\Service\Oauth2($client);
+    $googleUser = $googleService->userinfo->get();
+    $user = User::findByEmail($googleUser->email);
+
+    if ($user) {
+        if ($user['user_created_by'] == 'Sign Up') {
+            session_start();
+            $_SESSION['user'] = $user;
+            header("Location: /simple-auth/dashboard");
+            exit;
+        } else {
+            session_start();
+            $_SESSION['user'] = $user;
+            header("Location: /simple-auth/dashboard");
+            exit;
+        }
+    }
+
+    User::createSocialUser($googleUser->name, $googleUser->email);
+
+    $user = User::findByEmail($googleUser->email);
+
+    session_start();
+    $_SESSION['user'] = $user;
+    header("Location: /simple-auth/dashboard");
+    exit;
+}
+
+
 }
 
