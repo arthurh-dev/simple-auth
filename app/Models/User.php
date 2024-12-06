@@ -14,6 +14,28 @@ class User extends Model {
         return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 
+    public static function verifyLogin($email, $password)
+    {
+        // Obter conexão com o banco de dados
+        $db = self::getDB();
+        
+        // Preparar consulta SQL
+        $stmt = $db->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->bindParam(':email', $email, \PDO::PARAM_STR); // Use o namespace global \PDO
+        $stmt->execute();
+        
+        // Buscar os dados do usuário
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC); // Use \PDO aqui também
+
+        // Se o usuário não for encontrado ou a senha não coincidir, retornar falso
+        if (!$user || !password_verify($password, $user['password_hash'])) {
+            return false;
+        }
+
+        // Retornar os dados do usuário em caso de sucesso
+        return $user;
+    }
+
     // Marcar o e-mail como verificado
     public static function verifyEmail($email)
     {

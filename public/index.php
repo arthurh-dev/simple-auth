@@ -16,7 +16,11 @@ $router = new Router();
 // Definir as rotas
 $router->add('/', 'HomeController@index');
 $router->add('/register', 'AuthController@register');
+$router->add('/login', 'AuthController@login');
 $router->add('/confirm/{token}', 'AuthController@confirm');
+$router->add('/dashboard', 'DashboardController@index');
+$router->add('/logout', 'AuthController@logout');
+
 
 
 // Obter a URI atual
