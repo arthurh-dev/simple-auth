@@ -1,3 +1,5 @@
+<?php include_once __DIR__ . '../partials/cdns.php'; ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +10,6 @@
 <body>
     <h1>Login</h1>
     
-    <!-- Formulário de Login Básico -->
     <form action="/simple-auth/login" method="POST">
         <label for="email">Email:</label>
         <input type="email" id="email" name="email" required>
@@ -21,7 +22,6 @@
 
     <hr>
 
-    <!-- Botões para Login com Google e Microsoft -->
     <div>
         <h2>Ou faça login com:</h2>
         <a href="/simple-auth/google-login" style="text-decoration: none;">
