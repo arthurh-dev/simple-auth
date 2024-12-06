@@ -43,11 +43,8 @@ public function confirm($token)
 public function login()
 {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Sanitizar entradas
         $email = trim($_POST['email']);
         $password = $_POST['password'];
-
-        // Tentar verificar login
         $user = User::verifyLogin($email, $password);
 
         if (!$user) {
@@ -58,38 +55,32 @@ public function login()
         }
 
         if (!$user['is_verified']) {
-            // Usuário ainda não confirmou o email
             $error = "Por favor, confirme seu e-mail antes de fazer login.";
             include_once __DIR__ . '/../Views/auth/login.php';
             echo $error;
             return;
         }
 
-        // Login bem-sucedido, iniciar sessão
         session_start();
         $_SESSION['user'] = $user;
 
-        // Redirecionar para a rota do dashboard
         header("Location: /simple-auth/dashboard");
         exit;
     } else {
-        // Exibir o formulário de login
+
         include_once __DIR__ . '/../Views/auth/login.php';
     }
 }
 
 public function logout()
 {
-    // Inicia a sessão se ainda não estiver iniciada
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Destroi os dados da sessão
     session_unset();
     session_destroy();
 
-    // Redireciona para a página de login
     header("Location: /simple-auth/login");
     exit;
 }
