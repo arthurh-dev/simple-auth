@@ -6,6 +6,6 @@ class HomeController
 {
     public function index()
     {
-        echo "Welcome to the Home Page!";
+        include_once __DIR__ . '/../Views/home.php';
     }
 }

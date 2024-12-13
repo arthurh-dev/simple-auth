@@ -1,42 +1,54 @@
-<?php include_once __DIR__ . '/../partials/cdns.php'; ?>
+<?php include_once __DIR__ . '/../partials/css-cdns.php'; ?>
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <link rel="stylesheet" href="/assets/style.css">
 </head>
 
 <body>
-    <div class="d-flex vh-100 align-items-center justify-content-center">
-        <div class="container text-center max-width-500">
-            <h1 class="mb-4">Sign Up</h1>
-            <form action="/simple-auth/register" method="POST">
-                <div class="mb-3 row align-items-center">
-                    <label for="name" class="col-sm-3 col-form-label text-end">Name:</label>
-                    <div class="col-sm-8">
-                        <input class="form-control" type="text" name="name" id="name" required>
-                    </div>
+    <div class="mask d-flex align-items-center h-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-5 col-md-8">
+                    <form class="bg-white rounded shadow-5-strong p-5" action="/simple-auth/register" method="POST">
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input class="form-control" type="text" name="name" id="name" required>
+                            <label class="form-label" for="name">Name</label>
+                        </div>
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input class="form-control" type="email" name="email" id="email" required>
+                            <label class="form-label" for="email">Email</label>
+                        </div>
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input class="form-control" type="password" name="password" id="password" required>
+                            <label class="form-label" for="password">Password</label>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col d-flex justify-content-center">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="registerForm" required />
+                                    <label class="form-check-label" for="registerForm">
+                                        I agree all statements in <a href="#!">Terms of service</a>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" data-mdb-ripple-init>Register</button>
+                        <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="#!"
+                                class="link-primary">Sign In</a></p>
+                    </form>
                 </div>
-                <div class="mb-3 row align-items-center">
-                    <label for="email" class="col-sm-3 col-form-label text-end">Email:</label>
-                    <div class="col-sm-8">
-                        <input class="form-control" type="email" name="email" id="email" required>
-                    </div>
-                </div>
-                <div class="mb-4 row align-items-center">
-                    <label for="password" class="col-sm-3 col-form-label text-end">Password:</label>
-                    <div class="col-sm-8">
-                        <input class="form-control" type="password" name="password" id="password" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary w-50 mb-20">Register</button>
-            </form>
+            </div>
         </div>
     </div>
+
+    <?php include_once __DIR__ . '/../partials/js-cdns.php'; ?>
+
+
 </body>
 
 
