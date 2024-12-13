@@ -20,13 +20,16 @@ $router->add('/login', 'AuthController@login');
 $router->add('/confirm/{token}', 'AuthController@confirm');
 $router->add('/dashboard', 'DashboardController@index');
 $router->add('/logout', 'AuthController@logout');
+$router->add('/forgot-password', 'AuthController@forgotPassword');
+$router->add('/reset-password', 'AuthController@resetPassword');
+
 
 // Rotas Do Google e de outras API'S de auth
 $router->add('/google-login', 'AuthController@googleLogin');
 $router->add('/google-callback', 'AuthController@googleCallback');
 
 
-$basePath = '/simple-auth'; 
+$basePath = '/simple-auth';
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 
