@@ -36,7 +36,6 @@ $userController->checkRememberMe();
                             </button>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
-                            <!-- Checkbox -->
                             <div class="form-check mb-4">
                                 <input class="form-check-input me-2" type="checkbox" value="1" id="remember-me" name="remember_me" />
                                 <label class="form-check-label" for="remember-me">
