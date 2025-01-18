@@ -31,6 +31,24 @@
                         <div data-mdb-input-init class="form-outline mb-4">
                             <input class="form-control" type="password" name="password" id="password" required>
                             <label class="form-label" for="password">Password</label>
+                            <button type="button" class="btn btn-floating btn-outline-secondary btn-sm position-absolute toggle-password" style="right: 10px; top: 50%; transform: translateY(-50%);" data-target="password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+
+                        <ul id="password-requirements" class="password-requirements">
+                            <li id="lowercase-uppercase">At least one lowercase & one uppercase letter</li>
+                            <li id="number">At least one number (0-9)</li>
+                            <li id="special-char">At least one special character (!@#$%^&*)</li>
+                            <li id="min-length">At least 8 characters</li>
+                        </ul>
+
+                        <div data-mdb-input-init class="form-outline mb-4">
+                            <input class="form-control" type="password" name="password_confirm" id="password_confirm" required>
+                            <label class="form-label" for="password_confirm">Confirm your password</label>
+                            <button type="button" class="btn btn-floating btn-outline-secondary btn-sm position-absolute toggle-password" style="right: 10px; top: 50%; transform: translateY(-50%);" data-target="password_confirm">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
                         <div class="row mb-4">
                             <div class="col d-flex justify-content-center">
@@ -42,7 +60,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-lg btn-primary btn-block" data-mdb-ripple-init>Register</button>
+                        <button id="submit-button" type="submit" class="btn btn-lg btn-primary btn-block" data-mdb-ripple-init disabled>Register</button>
                         <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="http://localhost/login"
                                 class="link-primary">Sign In</a></p>
                     </form>
@@ -52,7 +70,7 @@
     </div>
 
     <?php include_once __DIR__ . '/../partials/js-cdns.php'; ?>
-
+    <script src="/assets/script.js"></script>
 
 </body>
 

@@ -1,4 +1,8 @@
-<?php include_once __DIR__ . '/../partials/css-cdns.php'; ?>
+<?php include_once __DIR__ . '/../partials/css-cdns.php';
+
+$userController = new \App\Controllers\AuthController();
+$userController->checkRememberMe();
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -27,12 +31,15 @@
                         <div data-mdb-input-init class="form-outline mb-4">
                             <input class="form-control" type="password" name="password" id="password" required>
                             <label class="form-label" for="password">Password</label>
+                            <button type="button" class="btn btn-outline-secondary btn-floating btn-sm position-absolute toggle-password" style="right: 10px; top: 50%; transform: translateY(-50%);" data-target="password">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <!-- Checkbox -->
                             <div class="form-check mb-4">
-                                <input class="form-check-input me-2" type="checkbox" value="" id="loginForms" />
-                                <label class="form-check-label" for="loginForms">
+                                <input class="form-check-input me-2" type="checkbox" value="1" id="remember-me" name="remember_me" />
+                                <label class="form-check-label" for="remember-me">
                                     Remember me
                                 </label>
                             </div>
@@ -59,7 +66,7 @@
     </div>
 
     <?php include_once __DIR__ . '/../partials/js-cdns.php'; ?>
-
+    <script src="/assets/script.js"></script>
 
 
 

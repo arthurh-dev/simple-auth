@@ -136,4 +136,31 @@ class User extends Model
         $stmt->bindValue(':email', $email, \PDO::PARAM_STR);
         return $stmt->execute();
     }
+
+    public static function findByRememberMeToken($token)
+    {
+        $db = self::getDB();
+        $stmt = $db->prepare('SELECT * FROM users WHERE remember_me_token = :token');
+        $stmt->bindValue(':token', $token, \PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+
+    public static function saveRememberMeToken($userId, $token)
+    {
+        $db = self::getDB();
+        $stmt = $db->prepare('UPDATE users SET remember_me_token = :token WHERE id = :user_id');
+        $stmt->bindValue(':token', $token, \PDO::PARAM_STR);
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+    }
+
+    public static function clearRememberMeToken($userId)
+    {
+        $db = self::getDB();
+        $stmt = $db->prepare('UPDATE users SET remember_me_token = NULL WHERE id = :user_id');
+        $stmt->bindValue(':user_id', $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+    }
 }
