@@ -42,7 +42,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block" data-mdb-ripple-init>Register</button>
+                        <button type="submit" class="btn btn-lg btn-primary btn-block" data-mdb-ripple-init>Register</button>
                         <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="http://localhost/login"
                                 class="link-primary">Sign In</a></p>
                     </form>

@@ -215,18 +215,13 @@ class AuthController
             $user = User::findByEmail($email);
 
             if (!$user || $user['user_created_by'] !== 'Sign Up') {
-                echo "Este email não pode usar o recurso de redefinição de senha.";
+                echo "If the email you specified exists in our system, we've sent a password reset link to it.";
                 return;
             }
-
-            // Gerar token de redefinição
             $resetToken = bin2hex(random_bytes(32));
             User::saveResetToken($email, $resetToken);
 
-            // Enviar e-mail com PHPMailer
             $this->sendResetPasswordEmail($email, $resetToken);
-
-            echo "Um link de redefinição foi enviado para o email.";
         } else {
             include_once __DIR__ . '/../Views/auth/forgot-password.php';
         }
@@ -258,7 +253,7 @@ class AuthController
                 . '<a href="' . $resetLink . '">Redefinir Senha</a>';
 
             $mail->send();
-            echo 'Um link de redefinição foi enviado para o email.';
+            echo "If the email you specified exists in our system, we've sent a password reset link to it.";
         } catch (Exception $e) {
             echo "Erro ao enviar o e-mail. Erro: {$mail->ErrorInfo}";
         }
