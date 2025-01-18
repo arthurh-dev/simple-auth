@@ -1,0 +1,15 @@
+.divider:after,
+.divider:before {
+  content: "";
+  flex: 1;
+  height: 2px;
+  background: #a7a6a6;
+}
+
+.btn-google {
+  background-color: rgb(221, 75, 57);
+}
+
+.btn-google:hover {
+  background-color: rgb(156, 56, 43);
+}

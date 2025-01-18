@@ -270,7 +270,7 @@ class AuthController
             // Processamento do formulário de redefinição de senha
             $token = $_POST['token'];
             $password = $_POST['password'];
-            $passwordConfirm = $_POST['password_confirmation'];
+            $passwordConfirm = $_POST['password_confirm'];
 
             // Verifique se as senhas coincidem
             if ($password !== $passwordConfirm) {
