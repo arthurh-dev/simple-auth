@@ -1,42 +1,5 @@
 <?php include_once __DIR__ . '/../partials/css-cdns.php'; ?>
 
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password</title>
-</head>
-
-<body>
-    <div class="mask d-flex align-items-center h-100">
-
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-5 col-md-8">
-                    <form class="bg-white rounded shadow-5-strong p-5" action="/simple-auth/reset-password" method="POST">
-                        <input type="hidden" name="token" value="<?= htmlspecialchars($_GET['token']) ?>">
-                        <h2 class="fw-bold mb-5 text-center">Reset Password</h2>
-                        <div data-mdb-input-init class="form-outline mb-4">
-                            <input class="form-control" type="password" name="password" id="password" required>
-                            <label class="form-label" for="email">New Password:</label>
-                        </div>
-                        <div data-mdb-input-init class="form-outline mb-4">
-                            <input class="form-control" type="password" name="password_confirm" id="password_confirm" required>
-                            <label class="form-label" for="password_confirm">Confirm Password:</label>
-                        </div>
-                        <button type="submit" class="btn btn-lg btn-primary btn-block">Submit</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-
-</html> -->
-
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -56,7 +19,6 @@
                         <input type="hidden" name="token" value="<?= htmlspecialchars($_GET['token']) ?>">
                         <h2 class="fw-bold mb-5 text-center">Reset Password</h2>
 
-                        <!-- Password Field -->
                         <div data-mdb-input-init class="form-outline mb-4 position-relative">
                             <input class="form-control" type="password" name="password" id="password" required>
                             <label class="form-label" for="password">New Password:</label>
@@ -65,7 +27,6 @@
                             </button>
                         </div>
 
-                        <!-- Password Requirements -->
                         <ul id="password-requirements" class="password-requirements">
                             <li id="lowercase-uppercase">At least one lowercase & one uppercase letter</li>
                             <li id="number">At least one number (0-9)</li>
@@ -73,7 +34,6 @@
                             <li id="min-length">At least 8 characters</li>
                         </ul>
 
-                        <!-- Confirm Password Field -->
                         <div data-mdb-input-init class="form-outline mb-4 position-relative">
                             <input class="form-control" type="password" name="password_confirm" id="password_confirm" required>
                             <label class="form-label" for="password_confirm">Confirm Password:</label>
@@ -89,7 +49,6 @@
         </div>
     </div>
 
-    <!-- Include JS CDNs -->
     <?php include_once __DIR__ . '/../partials/js-cdns.php'; ?>
     <script src="/assets/script.js"></script>
 

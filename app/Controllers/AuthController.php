@@ -45,19 +45,15 @@ class AuthController
 
     public function checkRememberMe()
     {
-        // Verifica se o cookie "remember_me" está presente
         if (isset($_COOKIE['remember_me'])) {
             $token = $_COOKIE['remember_me'];
 
-            // Busca o usuário com o token de "Remember Me" no banco de dados
             $user = User::findByRememberMeToken($token);
 
             if ($user) {
-                // Inicia a sessão se o token for válido
                 session_start();
                 $_SESSION['user'] = $user;
 
-                // Redireciona para o dashboard ou outra página protegida
                 header("Location: /simple-auth/dashboard");
                 exit;
             }
@@ -70,11 +66,9 @@ class AuthController
             $email = trim($_POST['email']);
             $password = $_POST['password'];
 
-            // Verifica as credenciais de login
             $user = User::verifyLogin($email, $password);
             $rememberMe = isset($_POST['remember_me']) ? true : false;
 
-            // Se as credenciais forem inválidas
             if (!$user) {
                 $error = "Credenciais inválidas.";
                 include_once __DIR__ . '/../Views/auth/login.php';
@@ -82,7 +76,6 @@ class AuthController
                 return;
             }
 
-            // Verifica se o e-mail foi confirmado
             if (!$user['is_verified']) {
                 $error = "Por favor, confirme seu e-mail antes de fazer login.";
                 include_once __DIR__ . '/../Views/auth/login.php';
@@ -90,27 +83,21 @@ class AuthController
                 return;
             }
 
-            // Inicia a sessão
             session_start();
             $_SESSION['user'] = $user;
 
-            // Se "Remember Me" for marcado
             if ($rememberMe) {
-                // Gera um token aleatório para "Remember Me"
-                $rememberMeToken = bin2hex(random_bytes(32)); // Token seguro
 
-                // Armazena o token no banco de dados
+                $rememberMeToken = bin2hex(random_bytes(32));
+
                 User::saveRememberMeToken($user['id'], $rememberMeToken);
 
-                // Define o cookie "remember_me" com segurança (adicionando HttpOnly e Secure)
                 setcookie('remember_me', $rememberMeToken, time() + 3600 * 24 * 30, "/", "", isset($_SERVER["HTTPS"]), true);
             }
 
-            // Redireciona para o dashboard após o login
             header("Location: /simple-auth/dashboard");
             exit;
         } else {
-            // Se o método não for POST, exibe a tela de login
             include_once __DIR__ . '/../Views/auth/login.php';
         }
     }
@@ -122,18 +109,15 @@ class AuthController
             session_start();
         }
 
-        // Verificar se o ID do usuário está presente na sessão
         if (isset($_SESSION['user']['id'])) {
             $userId = $_SESSION['user']['id'];
 
-            // Limpar o token de "Remember Me" no banco de dados
             User::clearRememberMeToken($userId);
         }
 
         session_unset();
         session_destroy();
 
-        // Limpar o cookie "Remember Me"
         setcookie('remember_me', '', time() - 3600, "/");
 
         header("Location: /simple-auth/login");
@@ -150,13 +134,11 @@ class AuthController
             $password = $_POST['password'];
             $passwordConfirm = $_POST['password_confirm'];
 
-            // Verifique se as senhas coincidem
             if ($password !== $passwordConfirm) {
                 echo "As senhas não coincidem.";
                 return;
             }
 
-            // Verifique a força da senha
             if (!isStrongPassword($password)) {
                 echo "A senha não atende aos requisitos de segurança.";
                 return;
@@ -329,24 +311,20 @@ class AuthController
     public function resetPassword()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Processamento do formulário de redefinição de senha
             $token = $_POST['token'];
             $password = $_POST['password'];
             $passwordConfirm = $_POST['password_confirm'];
 
-            // Verifique se as senhas coincidem
             if ($password !== $passwordConfirm) {
                 echo "As senhas não coincidem.";
                 return;
             }
 
-            // Verifique a força da senha
             if (!isStrongPassword($password)) {
                 echo "A senha não atende aos requisitos de segurança.";
                 return;
             }
 
-            // Buscar o usuário com base no token
             $user = User::findByResetToken($token);
 
             if (!$user) {
@@ -354,13 +332,11 @@ class AuthController
                 return;
             }
 
-            // Atualizar a senha no banco de dados
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             User::updatePassword($user['id'], $hashedPassword);
 
             echo "Senha redefinida com sucesso.";
         } else {
-            // Se a requisição for GET, exiba o formulário de redefinição de senha
             $token = $_GET['token'];
             $this->resetPasswordPage($token);
         }
@@ -381,22 +357,18 @@ class AuthController
 
 function isStrongPassword($password)
 {
-    // Verifica se a senha tem pelo menos uma letra minúscula e uma maiúscula
     if (!preg_match('/[a-z]/', $password) || !preg_match('/[A-Z]/', $password)) {
         return false;
     }
 
-    // Verifica se a senha tem pelo menos um número
     if (!preg_match('/\d/', $password)) {
         return false;
     }
 
-    // Verifica se a senha tem pelo menos um caractere especial
     if (!preg_match('/[!@#$%^&*]/', $password)) {
         return false;
     }
 
-    // Verifica se a senha tem pelo menos 8 caracteres
     if (strlen($password) < 8) {
         return false;
     }
