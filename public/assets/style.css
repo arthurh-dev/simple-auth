@@ -13,3 +13,25 @@
 .btn-google:hover {
   background-color: rgb(156, 56, 43);
 }
+
+.password-requirements {
+  list-style-type: none;
+  padding-left: 0;
+  display: none; /* Inicia escondido */
+  opacity: 0;
+  transition: opacity 0.3s ease; /* Adiciona transição suave */
+}
+
+.password-requirements li {
+  color: red;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.password-requirements li.valid {
+  color: green;
+}
+
+.toggle-password {
+  cursor: pointer;
+}
