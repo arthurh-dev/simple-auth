@@ -15,9 +15,3 @@
 <link
     href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.min.css"
     rel="stylesheet" />
-
-<!-- MDB -->
-
-<script
-    type="text/javascript"
-    src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/8.1.0/mdb.umd.min.js"></script>
