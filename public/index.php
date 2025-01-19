@@ -16,6 +16,7 @@ $router = new Router();
 // Definir as rotas das páginas
 $router->add('/', 'HomeController@index');
 $router->add('/register', 'AuthController@register');
+$router->add('/terms', 'AuthController@terms');
 $router->add('/login', 'AuthController@login');
 $router->add('/confirm/{token}', 'AuthController@confirm');
 $router->add('/dashboard', 'DashboardController@index');

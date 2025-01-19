@@ -19,7 +19,26 @@
                 <div class="col-xl-5 col-md-8">
 
                     <form class="bg-white rounded shadow-5-strong p-5" action="/simple-auth/register" method="POST">
-                        <h2 class="fw-bold mb-5 text-center">Register Now</h2>
+                        <h2 class="fw-bold mb-4 text-center">Register Now</h2>
+
+                        <?php if (!empty($successMessage)): ?>
+                            <div class="text-success text-center mb-3">
+                                <?= htmlspecialchars($successMessage) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($errors)): ?>
+                            <div class=" container d-flex justify-content-center mb-3">
+                                <div class="text-center text-danger">
+                                    <ul class="list-unstyled mb-0">
+                                        <?php foreach ($errors as $error): ?>
+                                            <li><?= htmlspecialchars($error) ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <div data-mdb-input-init class="form-outline mb-4">
                             <input class="form-control" type="text" name="name" id="name" required>
                             <label class="form-label" for="name">Name</label>
@@ -55,14 +74,16 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="" id="registerForm" required />
                                     <label class="form-check-label" for="registerForm">
-                                        I agree all statements in <a href="#!">Terms of service</a>
+                                        I agree all statements in <a href="/terms">Terms of service</a>
                                     </label>
                                 </div>
                             </div>
                         </div>
                         <button id="submit-button" type="submit" class="btn btn-lg btn-primary btn-block" data-mdb-ripple-init disabled>Register</button>
-                        <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="http://localhost/login"
+                        <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="/login"
                                 class="link-primary">Sign In</a></p>
+
+
                     </form>
                 </div>
             </div>
