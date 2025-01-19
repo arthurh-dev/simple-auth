@@ -19,7 +19,7 @@
                 <div class="col-xl-5 col-md-8">
                     <form class="bg-white rounded shadow-5-strong p-5" action="/simple-auth/forgot-password" method="POST">
                         <h2 class="fw-bold mb-4 text-center">Forgot your password?</h2>
-                        <p class="fw-bold mb-5 text-center">Enter your email address to reset your password</p>
+                        <p class="fw-bold mb-4 text-center">Enter your email address to reset your password</p>
                         <?php if (!empty($errors)): ?>
                             <div class="alert alert-danger">
                                 <ul class="mb-0">
