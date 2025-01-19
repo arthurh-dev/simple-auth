@@ -16,8 +16,24 @@
             <div class="row justify-content-center">
                 <div class="col-xl-5 col-md-8">
                     <form id="reset-password-form" class="bg-white rounded shadow-5-strong p-5" action="/simple-auth/reset-password" method="POST">
-                        <input type="hidden" name="token" value="<?= htmlspecialchars($_GET['token']) ?>">
-                        <h2 class="fw-bold mb-5 text-center">Reset Password</h2>
+                        <h2 class="fw-bold mb-4 text-center">Reset Password</h2>
+                        <input type="hidden" name="token" value="<?= htmlspecialchars($_GET['token'] ?? '') ?>">
+
+                        <?php if (!empty($errors)): ?>
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    <?php foreach ($errors as $error): ?>
+                                        <li><?= htmlspecialchars($error) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($successMessage)): ?>
+                            <div class="alert alert-success text-center">
+                                <?= htmlspecialchars($successMessage) ?>
+                            </div>
+                        <?php endif; ?>
 
                         <div data-mdb-input-init class="form-outline mb-4 position-relative">
                             <input class="form-control" type="password" name="password" id="password" required>

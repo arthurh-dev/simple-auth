@@ -11,36 +11,36 @@ class AuthController
 {
     public function confirm($token)
     {
+        $message = '';
+        $messageType = '';
 
         if (empty($token)) {
-            echo "Token inválido.";
-            return;
-        }
-
-
-        $user = User::findByToken($token);
-
-        if (!$user) {
-            echo "Token inválido ou expirado.";
-            return;
-        }
-
-
-        if ($user['is_verified'] == 1) {
-            echo "O e-mail já foi confirmado.";
-            return;
-        }
-
-
-        $result = User::verifyEmail($user['email']);
-
-        if ($result) {
-            echo "E-mail confirmado com sucesso!";
+            $message = "Invalid token.";
+            $messageType = 'danger';
         } else {
-            echo "Erro ao confirmar o e-mail. Tente novamente.";
-        }
-    }
+            $user = User::findByToken($token);
 
+            if (!$user) {
+                $message = "Invalid or expired token.";
+                $messageType = 'danger';
+            } elseif ($user['is_verified'] == 1) {
+                $message = "Your email has already been confirmed.";
+                $messageType = 'warning';
+            } else {
+                $result = User::verifyEmail($user['email']);
+
+                if ($result) {
+                    $message = "Email confirmed successfully!";
+                    $messageType = 'success';
+                } else {
+                    $message = "Failed to confirm your email. Please try again.";
+                    $messageType = 'danger';
+                }
+            }
+        }
+
+        include_once __DIR__ . '/../Views/auth/confirm_email.php';
+    }
 
 
     public function checkRememberMe()
@@ -54,7 +54,7 @@ class AuthController
                 session_start();
                 $_SESSION['user'] = $user;
 
-                header("Location: /simple-auth/dashboard");
+                header("Location: /dashboard");
                 exit;
             }
         }
@@ -62,6 +62,7 @@ class AuthController
 
     public function login()
     {
+        $errors = [];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
             $password = $_POST['password'];
@@ -70,36 +71,34 @@ class AuthController
             $rememberMe = isset($_POST['remember_me']) ? true : false;
 
             if (!$user) {
-                $error = "Credenciais inválidas.";
-                include_once __DIR__ . '/../Views/auth/login.php';
-                echo $error;
-                return;
+                $errors[] = "Invalid username or password.";
+            } elseif (!$user['is_verified']) {
+                $errors[] = "Please confirm your email before logging in.";
             }
 
-            if (!$user['is_verified']) {
-                $error = "Por favor, confirme seu e-mail antes de fazer login.";
-                include_once __DIR__ . '/../Views/auth/login.php';
-                echo $error;
-                return;
+            if (empty($errors)) {
+                session_start();
+                $_SESSION['user'] = $user;
+
+                if ($rememberMe) {
+                    $rememberMeToken = bin2hex(random_bytes(32));
+                    User::saveRememberMeToken($user['id'], $rememberMeToken);
+
+                    setcookie('remember_me', $rememberMeToken, time() + 3600 * 24 * 30, "/", "", isset($_SERVER["HTTPS"]), true);
+                }
+
+                header("Location: /dashboard");
+                exit;
             }
-
-            session_start();
-            $_SESSION['user'] = $user;
-
-            if ($rememberMe) {
-
-                $rememberMeToken = bin2hex(random_bytes(32));
-
-                User::saveRememberMeToken($user['id'], $rememberMeToken);
-
-                setcookie('remember_me', $rememberMeToken, time() + 3600 * 24 * 30, "/", "", isset($_SERVER["HTTPS"]), true);
-            }
-
-            header("Location: /simple-auth/dashboard");
-            exit;
-        } else {
-            include_once __DIR__ . '/../Views/auth/login.php';
         }
+
+        include_once __DIR__ . '/../Views/auth/login.php';
+    }
+
+
+    public function terms()
+    {
+        include_once __DIR__ . '/../Views/auth/terms.php';
     }
 
 
@@ -120,49 +119,57 @@ class AuthController
 
         setcookie('remember_me', '', time() - 3600, "/");
 
-        header("Location: /simple-auth/login");
+        header("Location: /login");
         exit;
     }
 
 
     public function register()
     {
+        $errors = [];
+        $successMessage = "";
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST['name'];
-            $email = $_POST['email'];
+            $name = trim($_POST['name']);
+            $email = trim($_POST['email']);
             $password = $_POST['password'];
             $passwordConfirm = $_POST['password_confirm'];
 
+            // Validate passwords match
             if ($password !== $passwordConfirm) {
-                echo "As senhas não coincidem.";
-                return;
+                $errors[] = "Passwords do not match.";
             }
 
+            // Validate password strength
             if (!isStrongPassword($password)) {
-                echo "A senha não atende aos requisitos de segurança.";
-                return;
+                $errors[] = "The password does not meet security requirements.";
             }
 
-            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
+            // Check if email already exists
             if (User::findByEmail($email)) {
-                echo "Este e-mail já está em uso.";
-                return;
+                $errors[] = "This email is already in use.";
             }
 
-            $result = User::create($name, $email, $hashedPassword);
+            if (empty($errors)) {
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-            if ($result) {
-                echo "Usuário registrado com sucesso!";
+                $result = User::create($name, $email, $hashedPassword);
 
-                $this->sendConfirmationEmail($email);
-            } else {
-                echo "Erro ao registrar o usuário. Tente novamente.";
+                if ($result) {
+                    $emailStatus = $this->sendConfirmationEmail($email);
+
+                    if ($emailStatus === true) {
+                        $successMessage = "User registered successfully! Please check your email for confirmation.";
+                    } else {
+                        $errors[] = $emailStatus;
+                    }
+                } else {
+                    $errors[] = "Error registering the user. Please try again.";
+                }
             }
-        } else {
-            include_once __DIR__ . '/../Views/auth/register.php';
         }
+
+        include_once __DIR__ . '/../Views/auth/register.php';
     }
 
     private function sendConfirmationEmail($email)
@@ -180,23 +187,22 @@ class AuthController
 
             $token = bin2hex(random_bytes(16));
 
-
             User::storeVerificationToken($email, $token);
 
-            $verificationLink = "http://localhost/simple-auth/confirm/$token";
+            $verificationLink = $_ENV['BASE_URL'] . "confirm/$token";
 
             $mail->setFrom($_ENV['MAIL_USERNAME'], 'Teste');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
             $mail->CharSet = 'UTF-8';
-            $mail->Subject = 'Confirmação de Registro';
-            $mail->Body    = 'Obrigado por se registrar!<br>Por favor, clique no link abaixo para confirmar seu e-mail.<br><a href="' . $verificationLink . '">Confirmar e-mail</a>';
+            $mail->Subject = 'Registration Confirmation';
+            $mail->Body    = 'Thank you for registering!<br>Please click the link below to confirm your email.<br><a href="' . $verificationLink . '">Confirm Email</a>';
 
             $mail->send();
-            echo 'Mensagem de confirmação enviada.';
+            return true; // Indica sucesso
         } catch (Exception $e) {
-            echo "Erro ao enviar o e-mail. Erro: {$mail->ErrorInfo}";
+            return "Error sending confirmation email: {$mail->ErrorInfo}"; // Retorna o erro
         }
     }
 
@@ -205,7 +211,7 @@ class AuthController
         $client = new GoogleClient();
         $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
         $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-        $client->setRedirectUri('http://localhost/simple-auth/google-callback');
+        $client->setRedirectUri($_ENV['BASE_URL'] . 'simple-auth/google-callback');
         $client->addScope('email');
         $client->addScope('profile');
 
@@ -219,7 +225,7 @@ class AuthController
         $client = new GoogleClient();
         $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
         $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
-        $client->setRedirectUri('http://localhost/simple-auth/google-callback');
+        $client->setRedirectUri($_ENV['BASE_URL'] . 'simple-auth/google-callback');
 
         if (!isset($_GET['code'])) {
             echo "Código de autorização não fornecido.";
@@ -237,12 +243,12 @@ class AuthController
             if ($user['user_created_by'] == 'Sign Up') {
                 session_start();
                 $_SESSION['user'] = $user;
-                header("Location: /simple-auth/dashboard");
+                header("Location: /dashboard");
                 exit;
             } else {
                 session_start();
                 $_SESSION['user'] = $user;
-                header("Location: /simple-auth/dashboard");
+                header("Location: /dashboard");
                 exit;
             }
         }
@@ -253,28 +259,38 @@ class AuthController
 
         session_start();
         $_SESSION['user'] = $user;
-        header("Location: /simple-auth/dashboard");
+        header("Location: /dashboard");
         exit;
     }
 
     public function forgotPassword()
     {
+        $errors = [];
+        $successMessage = '';
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email']);
             $user = User::findByEmail($email);
 
-            if (!$user || $user['user_created_by'] !== 'Sign Up') {
-                echo "If the email you specified exists in our system, we've sent a password reset link to it.";
-                return;
-            }
             $resetToken = bin2hex(random_bytes(32));
-            User::saveResetToken($email, $resetToken);
 
-            $this->sendResetPasswordEmail($email, $resetToken);
-        } else {
-            include_once __DIR__ . '/../Views/auth/forgot-password.php';
+            $saveTokenResult = User::saveResetToken($email, $resetToken);
+
+            if ($saveTokenResult) {
+                if ($this->sendResetPasswordEmail($email, $resetToken)) {
+                    $successMessage = "If the email you specified exists in our system, we've sent a password reset link to it.";
+                } else {
+                    $errors[] = "Failed to send the password reset email. Please try again later.";
+                }
+            } else {
+                $errors[] = "An error occurred while processing your request. Please try again.";
+            }
         }
+
+        include_once __DIR__ . '/../Views/auth/forgot-password.php';
     }
+
+
 
     private function sendResetPasswordEmail($email, $resetToken)
     {
@@ -289,58 +305,66 @@ class AuthController
             $mail->SMTPSecure = $_ENV['MAIL_SMTPSECURE'];
             $mail->Port = $_ENV['MAIL_PORT'];
 
-            $resetLink = $_ENV['BASE_URL'] . "/reset-password?token=$resetToken";
+            $resetLink = $_ENV['BASE_URL'] . "reset-password?token=$resetToken";
 
-            $mail->setFrom($_ENV['MAIL_USERNAME'], 'Seu Sistema');
+            $mail->setFrom($_ENV['MAIL_USERNAME'], 'Your System');
             $mail->addAddress($email);
 
             $mail->isHTML(true);
             $mail->CharSet = 'UTF-8';
-            $mail->Subject = 'Redefinição de Senha';
-            $mail->Body    = 'Você solicitou uma redefinição de senha.<br>'
-                . 'Clique no link abaixo para redefinir sua senha:<br>'
-                . '<a href="' . $resetLink . '">Redefinir Senha</a>';
+            $mail->Subject = 'Password Reset';
+            $mail->Body    = 'You requested a password reset.<br>'
+                . 'Click the link below to reset your password:<br>'
+                . '<a href="' . $resetLink . '">Reset Password</a>';
 
             $mail->send();
-            echo "If the email you specified exists in our system, we've sent a password reset link to it.";
+            return true;
         } catch (Exception $e) {
-            echo "Erro ao enviar o e-mail. Erro: {$mail->ErrorInfo}";
+            error_log("Error sending password reset email: {$mail->ErrorInfo}");
+            return false;
         }
     }
 
+
     public function resetPassword()
     {
+        $errors = [];
+        $successMessage = '';
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $token = $_POST['token'];
             $password = $_POST['password'];
             $passwordConfirm = $_POST['password_confirm'];
 
             if ($password !== $passwordConfirm) {
-                echo "As senhas não coincidem.";
-                return;
+                $errors[] = "The passwords do not match.";
             }
 
             if (!isStrongPassword($password)) {
-                echo "A senha não atende aos requisitos de segurança.";
-                return;
+                $errors[] = "The password does not meet the security requirements.";
             }
-
             $user = User::findByResetToken($token);
 
             if (!$user) {
-                echo "Token inválido ou expirado.";
-                return;
+                $errors[] = "Invalid or expired token.";
             }
 
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-            User::updatePassword($user['id'], $hashedPassword);
+            if (empty($errors)) {
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $updateResult = User::updatePassword($user['id'], $hashedPassword);
 
-            echo "Senha redefinida com sucesso.";
-        } else {
-            $token = $_GET['token'];
-            $this->resetPasswordPage($token);
+                if ($updateResult) {
+                    $successMessage = "Password successfully reset.";
+                } else {
+                    $errors[] = "An error occurred while resetting the password. Please try again.";
+                }
+            }
         }
+
+        include_once __DIR__ . '/../Views/auth/reset-password.php';
     }
+
+
 
     public function resetPasswordPage($token)
     {
