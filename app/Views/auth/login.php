@@ -56,7 +56,7 @@ $userController->checkRememberMe();
                                     Remember me
                                 </label>
                             </div>
-                            <a href="/simple-auth/forgot-password" class="text-body mb-4">Forgot password?</a>
+                            <a href="/forgot-password" class="text-body mb-4">Forgot password?</a>
                         </div>
                         <button type="submit" class="btn btn-lg btn-primary btn-block" data-mdb-ripple-init>Login</button>
                         <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="/register"

@@ -40,6 +40,9 @@
                             <label class="form-label" for="email">Email</label>
                         </div>
                         <button type="submit" class="btn btn-lg btn-primary btn-block">Submit</button>
+                        <div class="text-center mt-3">
+                            <a href="/login" class="btn btn-link">Back to Login</a>
+                        </div>
                     </form>
                 </div>
             </div>
